@@ -7,6 +7,9 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import TestConnection from './pages/TestConnection';
+import SimpleAuth from './pages/SimpleAuth';
+import DetailedTestConnection from './pages/DetailedTestConnection';
 
 // Tema personalizado para PartidoHoy
 const theme = createTheme({
@@ -37,6 +40,9 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/test-connection" element={<TestConnection />} />
+            <Route path="/detailed-test" element={<DetailedTestConnection />} />
+            <Route path="/simple-auth" element={<SimpleAuth />} />
             <Route 
               path="/dashboard" 
               element={
@@ -45,7 +51,7 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>
       </AuthProvider>
@@ -53,4 +59,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

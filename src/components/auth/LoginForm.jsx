@@ -129,6 +129,10 @@ const LoginForm = () => {
               <Link to="/register">
                 ¿No tienes cuenta? Regístrate
               </Link>
+              <br />
+              <Link to="/test-connection" style={{ fontSize: '0.85rem', marginTop: '8px', display: 'inline-block' }}>
+                🔧 ¿Problemas de conexión? Diagnóstico
+              </Link>
             </Box>
           </Box>
         </Paper>

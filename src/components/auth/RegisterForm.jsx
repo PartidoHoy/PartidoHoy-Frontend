@@ -78,7 +78,26 @@ const RegisterForm = () => {
         navigate('/login');
       }, 2000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al registrarse');
+      console.error('Registration error:', err);
+      
+      // Manejo detallado de errores
+      if (err.response?.status === 403) {
+        setError(`Acceso denegado (403). Tu configuración CORS se ve correcta, pero verifica:
+
+1. ¿Reiniciaste el backend después del cambio?
+2. ¿El backend está en puerto 8080?
+3. ¿Hay algún filtro de seguridad adicional?
+
+Usa /test-connection para diagnóstico detallado.`);
+      } else if (err.response?.status === 409) {
+        setError('El email ya está registrado. Intenta con otro email.');
+      } else if (err.response?.status === 400) {
+        setError(err.response?.data?.message || 'Datos inválidos. Verifica los campos.');
+      } else if (err.code === 'ERR_NETWORK') {
+        setError('No se puede conectar al servidor. Verifica que el backend esté ejecutándose en http://localhost:8080');
+      } else {
+        setError(err.response?.data?.message || `Error del servidor: ${err.response?.status || 'Desconocido'}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -172,6 +191,10 @@ const RegisterForm = () => {
             <Box textAlign="center">
               <Link to="/login">
                 ¿Ya tienes cuenta? Inicia sesión
+              </Link>
+              <br />
+              <Link to="/test-connection" style={{ fontSize: '0.85rem', marginTop: '8px', display: 'inline-block' }}>
+                🔧 ¿Problemas de conexión? Diagnóstico
               </Link>
             </Box>
           </Box>
