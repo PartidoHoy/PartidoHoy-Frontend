@@ -1,0 +1,17 @@
+/* Estilos globales para PartidoHoy */
+.MuiButton-root {
+  text-transform: none !important;
+}
+
+.MuiPaper-root {
+  border-radius: 12px !important;
+}
+
+a {
+  color: #1a5f3f;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
