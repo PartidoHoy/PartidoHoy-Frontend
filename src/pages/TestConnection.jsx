@@ -32,7 +32,7 @@ const TestConnection = () => {
         body: JSON.stringify({
           nombre: 'Test User',
           email: `test${Date.now()}@example.com`, // Email único para evitar conflictos
-          password: '12345678'
+          password: 'TestPass123' // Contraseña que cumple requisitos: mayúscula, minúscula, número
         })
       });
       
@@ -94,7 +94,7 @@ const TestConnection = () => {
       const testData = {
         nombre: 'Test User ' + Date.now(),
         email: `test${Date.now()}@test.com`,
-        password: 'password123'
+        password: 'TestPass123' // Contraseña segura: mayúscula, minúscula, número
       };
       
       const response = await api.post('/auth/register', testData);
@@ -133,7 +133,7 @@ const TestConnection = () => {
       const testData = {
         nombre: 'Fetch Test User ' + Date.now(),
         email: `fetchtest${Date.now()}@test.com`,
-        password: 'password123'
+        password: 'TestPass123' // Contraseña segura: mayúscula, minúscula, número
       };
       
       const response = await fetch('http://localhost:8080/auth/register', {
@@ -167,14 +167,36 @@ const TestConnection = () => {
     try {
       console.log('🧪 Testing login endpoint...');
       
+      // Primero intentamos crear un usuario de prueba con credenciales conocidas
+      const testUser = {
+        nombre: 'Test Login User',
+        email: 'testlogin@example.com',
+        password: 'TestPass123' // Contraseña que cumple todos los requisitos
+      };
+      
+      // Intentar registrar usuario de prueba (puede fallar si ya existe, está bien)
+      try {
+        await fetch('http://localhost:8080/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(testUser)
+        });
+        console.log('Usuario de prueba creado (o ya existía)');
+      } catch (regError) {
+        console.log('El usuario de prueba ya existe o hubo error en registro:', regError.message);
+      }
+      
+      // Ahora intentar hacer login con las credenciales conocidas
       const response = await fetch('http://localhost:8080/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: 'test@example.com', // Usuario conocido
-          password: '12345678'
+          email: testUser.email,
+          password: testUser.password
         })
       });
       

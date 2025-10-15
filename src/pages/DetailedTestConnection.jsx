@@ -51,7 +51,7 @@ const DetailedTestConnection = () => {
     const testUser = {
       nombre: 'Test User',
       email: `test${Date.now()}@example.com`,
-      password: '12345678'
+      password: 'TestPass123' // Contraseña que cumple requisitos: mayúscula, minúscula, número
     };
     
     try {
