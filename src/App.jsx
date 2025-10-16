@@ -10,6 +10,11 @@ import Dashboard from './pages/Dashboard';
 import TestConnection from './pages/TestConnection';
 import SimpleAuth from './pages/SimpleAuth';
 import DetailedTestConnection from './pages/DetailedTestConnection';
+import UserProfile from './pages/UserProfile';
+import UserList from './pages/UserList';
+import UserDetail from './pages/UserDetail';
+import CompleteProfile from './pages/CompleteProfile';
+import Players from './pages/Players';
 
 // Tema personalizado para PartidoHoy
 const theme = createTheme({
@@ -43,6 +48,8 @@ function App() {
             <Route path="/test-connection" element={<TestConnection />} />
             <Route path="/detailed-test" element={<DetailedTestConnection />} />
             <Route path="/simple-auth" element={<SimpleAuth />} />
+            
+            {/* Rutas protegidas */}
             <Route 
               path="/dashboard" 
               element={
@@ -51,7 +58,48 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route 
+              path="/complete-profile" 
+              element={
+                <ProtectedRoute>
+                  <CompleteProfile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <UserProfile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/users" 
+              element={
+                <ProtectedRoute>
+                  <UserList />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/users/:userId" 
+              element={
+                <ProtectedRoute>
+                  <UserDetail />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/players" 
+              element={
+                <ProtectedRoute>
+                  <Players />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </Router>
       </AuthProvider>

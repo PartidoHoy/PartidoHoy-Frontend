@@ -13,13 +13,25 @@ const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      if (authService.isAuthenticated()) {
+      const token = localStorage.getItem('jwt');
+      console.log('🔍 Checking auth status - Token exists:', !!token);
+      
+      if (token) {
+        console.log('🔍 Validating token with backend...');
         const userData = await authService.getCurrentUser();
+        console.log('✅ Token valid, user data:', userData);
         setUser(userData);
+      } else {
+        console.log('🚫 No token found');
+        setUser(null);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      console.error('❌ Auth check failed:', error);
+      console.log('🧹 Clearing invalid token and user data');
+      // Si hay error, limpiar autenticación completamente
       localStorage.removeItem('jwt');
+      localStorage.removeItem('fallbackProfile'); // También limpiar perfil fallback
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -47,7 +59,7 @@ const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !loading && !!localStorage.getItem('jwt'), // Triple validación
     isAdmin: user?.roles?.includes('ADMIN'),
   };
 

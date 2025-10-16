@@ -15,7 +15,7 @@ import {
 
 const RegisterForm = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -73,10 +73,21 @@ const RegisterForm = () => {
 
     try {
       await register(formData.nombre, formData.email, formData.password);
-      setSuccess('Registro exitoso. Puedes iniciar sesión ahora.');
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+      setSuccess('Registro exitoso. Iniciando sesión...');
+      
+      // Hacer login automático después del registro
+      try {
+        await login(formData.email, formData.password);
+        setTimeout(() => {
+          navigate('/complete-profile');
+        }, 1500);
+      } catch (loginErr) {
+        console.error('Auto-login failed:', loginErr);
+        setSuccess('Registro exitoso. Redirigiendo al login...');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      }
     } catch (err) {
       console.error('Registration error:', err);
       
