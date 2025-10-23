@@ -39,7 +39,8 @@ import {
   Message,
   Close,
   Home,
-  TrendingUp
+  TrendingUp,
+  Star
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -69,8 +70,10 @@ const Header = () => {
     { label: 'Inicio', icon: <Home />, path: '/dashboard', exact: true },
     { label: 'Buscar Partidos', icon: <SportsSoccer />, path: '/matches' },
     { label: 'Jugadores', icon: <Group />, path: '/players' },
+    { label: 'Top Jugadores', icon: <Star />, path: '/top-players' },
     { label: 'Mis Equipos', icon: <EmojiEvents />, path: '/teams' },
     { label: 'Calendario', icon: <CalendarToday />, path: '/calendar' },
+    { label: 'Mi Perfil', icon: <Person />, path: '/my-profile' },
     { label: 'Estadísticas', icon: <TrendingUp />, path: '/stats' }
   ];
 

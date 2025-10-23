@@ -163,11 +163,22 @@ const CompleteProfile = () => {
         }
       }
 
-      // Redirigir al dashboard después de un breve delay
+      // Redirigir al dashboard después de completar exitosamente
+      // Forzar recarga del validador de perfil global
+      if (window.isProfileComplete) {
+        // Limpiar cache del validador si existe
+        delete window.profileCache;
+      }
+      
+      // Emitir evento personalizado para notificar cambio de perfil
+      window.dispatchEvent(new CustomEvent('profileCompleted', { 
+        detail: { profileData: profileResult }
+      }));
+      
       // Dar más tiempo en modo fallback para que el usuario lea el mensaje
-      const redirectDelay = profileResult?.fallbackMode ? 4000 : 2000;
+      const redirectDelay = profileResult?.fallbackMode ? 3000 : 1500;
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
       }, redirectDelay);
 
     } catch (err) {

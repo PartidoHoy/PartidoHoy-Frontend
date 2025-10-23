@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import Layout from './components/layout/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -15,6 +16,13 @@ import UserList from './pages/UserList';
 import UserDetail from './pages/UserDetail';
 import CompleteProfile from './pages/CompleteProfile';
 import Players from './pages/Players';
+import TopPlayers from './pages/TopPlayers';
+import MyProfile from './pages/MyProfile';
+import Matches from './pages/Matches';
+import CreateMatch from './pages/CreateMatch';
+import Teams from './pages/Teams';
+import Calendar from './pages/Calendar';
+import Stats from './pages/Stats';
 
 // Tema personalizado para PartidoHoy
 const theme = createTheme({
@@ -54,7 +62,9 @@ function App() {
               path="/dashboard" 
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
                 </ProtectedRoute>
               } 
             />
@@ -62,7 +72,9 @@ function App() {
               path="/complete-profile" 
               element={
                 <ProtectedRoute>
-                  <CompleteProfile />
+                  <Layout>
+                    <CompleteProfile />
+                  </Layout>
                 </ProtectedRoute>
               } 
             />
@@ -70,7 +82,9 @@ function App() {
               path="/profile" 
               element={
                 <ProtectedRoute>
-                  <UserProfile />
+                  <Layout>
+                    <UserProfile />
+                  </Layout>
                 </ProtectedRoute>
               } 
             />
@@ -78,7 +92,9 @@ function App() {
               path="/users" 
               element={
                 <ProtectedRoute>
-                  <UserList />
+                  <Layout>
+                    <UserList />
+                  </Layout>
                 </ProtectedRoute>
               } 
             />
@@ -86,7 +102,9 @@ function App() {
               path="/users/:userId" 
               element={
                 <ProtectedRoute>
-                  <UserDetail />
+                  <Layout>
+                    <UserDetail />
+                  </Layout>
                 </ProtectedRoute>
               } 
             />
@@ -94,7 +112,79 @@ function App() {
               path="/players" 
               element={
                 <ProtectedRoute>
-                  <Players />
+                  <Layout>
+                    <Players />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/top-players" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <TopPlayers />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/my-profile" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <MyProfile />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/matches" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Matches />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/create-match" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <CreateMatch />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/teams" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Teams />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/calendar" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Calendar />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/stats" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Stats />
+                  </Layout>
                 </ProtectedRoute>
               } 
             />

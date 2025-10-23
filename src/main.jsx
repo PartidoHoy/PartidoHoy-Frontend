@@ -15,6 +15,7 @@ import './utils/profileValidator.js'
 import './utils/profileValidatorImproved.js'
 import './utils/newUserFixer.js'
 import './utils/backendAuthFixer.js'
+import './utils/match403Fixer.js'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

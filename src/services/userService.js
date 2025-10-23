@@ -597,7 +597,184 @@ export const userService = {
     }
   },
 
-  // 👥 OBTENER LISTA DE USUARIOS
+  // 👥 OBTENER LISTA DE JUGADORES CON TARJETAS
+  getPlayers: async (page = 1, limit = 100) => {
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    console.log('🏆 userService.getPlayers: obteniendo tarjetas de jugadores');
+    
+    try {
+      const response = await fetch(`http://localhost:8080/api/profiles/cards/search?page=${page}&limit=${limit}`, {
+        method: 'GET',
+        headers: getOptimizedAuthHeaders(token)
+      });
+      
+      if (response.ok) {
+        const players = await response.json();
+        console.log('✅ getPlayers success:', players);
+        return players;
+      } else {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('⚠️ getPlayers error:', error.message);
+      throw error;
+    }
+  },
+
+  // � OBTENER TODAS LAS TARJETAS DE JUGADORES
+  getPlayerCards: async (page = 0, size = 20) => {
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    console.log('🃏 userService.getPlayerCards: obteniendo todas las tarjetas de jugadores');
+    
+    try {
+      // Usar endpoint de búsqueda de cards con paginación
+      console.log('🔍 Usando endpoint de búsqueda de cards...');
+      const searchParams = new URLSearchParams({
+        page: page.toString(),
+        size: size.toString()
+      });
+      
+      const response = await fetch(`http://localhost:8080/api/profiles/cards/search?${searchParams}`, {
+        method: 'GET',
+        headers: getOptimizedAuthHeaders(token)
+      });
+      
+      if (response.ok) {
+        const cardsData = await response.json();
+        console.log('✅ getPlayerCards success:', cardsData);
+        return cardsData;
+      } else {
+        console.error('❌ getPlayerCards error:', response.status, response.statusText);
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('⚠️ getPlayerCards error:', error.message);
+      throw error;
+    }
+  },
+
+  // �🏆 OBTENER TARJETA DE JUGADOR ESPECÍFICO
+  getPlayerCard: async (userId) => {
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    console.log(`🏆 userService.getPlayerCard: obteniendo tarjeta del jugador ${userId}`);
+    
+    try {
+      const response = await fetch(`http://localhost:8080/api/profiles/${userId}/card`, {
+        method: 'GET',
+        headers: getOptimizedAuthHeaders(token)
+      });
+      
+      if (response.ok) {
+        const playerCard = await response.json();
+        console.log('✅ getPlayerCard success:', playerCard);
+        return playerCard;
+      } else {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('⚠️ getPlayerCard error:', error.message);
+      throw error;
+    }
+  },
+
+  // 🙋‍♂️ OBTENER MI PROPIA TARJETA
+  getMyPlayerCard: async () => {
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    console.log('🙋‍♂️ userService.getMyPlayerCard: obteniendo mi tarjeta');
+    
+    try {
+      const response = await fetch('http://localhost:8080/api/profiles/me/card', {
+        method: 'GET',
+        headers: getOptimizedAuthHeaders(token)
+      });
+      
+      if (response.ok) {
+        const myCard = await response.json();
+        console.log('✅ getMyPlayerCard success:', myCard);
+        return myCard;
+      } else {
+        console.error('❌ getMyPlayerCard error:', response.status, response.statusText);
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('⚠️ getMyPlayerCard error:', error.message);
+      throw error;
+    }
+  },
+
+  // 🥇 OBTENER TOP JUGADORES POR VICTORIAS
+  getTopPlayersByWins: async (limit = 10) => {
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    console.log('🥇 userService.getTopPlayersByWins: obteniendo top jugadores por victorias');
+    
+    try {
+      const response = await fetch(`http://localhost:8080/api/profiles/cards/top/wins?limit=${limit}`, {
+        method: 'GET',
+        headers: getOptimizedAuthHeaders(token)
+      });
+      
+      if (response.ok) {
+        const topPlayers = await response.json();
+        console.log('✅ getTopPlayersByWins success:', topPlayers);
+        return topPlayers;
+      } else {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('⚠️ getTopPlayersByWins error:', error.message);
+      throw error;
+    }
+  },
+
+  // ⚽ OBTENER TOP JUGADORES POR GOLES
+  getTopPlayersByGoals: async (limit = 10) => {
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    console.log('⚽ userService.getTopPlayersByGoals: obteniendo top jugadores por goles');
+    
+    try {
+      const response = await fetch(`http://localhost:8080/api/profiles/cards/top/goals?limit=${limit}`, {
+        method: 'GET',
+        headers: getOptimizedAuthHeaders(token)
+      });
+      
+      if (response.ok) {
+        const topPlayers = await response.json();
+        console.log('✅ getTopPlayersByGoals success:', topPlayers);
+        return topPlayers;
+      } else {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('⚠️ getTopPlayersByGoals error:', error.message);
+      throw error;
+    }
+  },
+
+  // 👥 OBTENER LISTA DE USUARIOS (MÉTODO ORIGINAL MANTENIDO)
   getUsers: async (page = 1, limit = 10) => {
     const token = localStorage.getItem('jwt');
     if (!token) {
@@ -607,7 +784,7 @@ export const userService = {
     console.log('👥 userService.getUsers: obteniendo lista de usuarios');
     
     try {
-      const response = await fetch(`http://localhost:8080/api/profiles/search?page=${page}&limit=${limit}`, {
+      const response = await fetch(`http://localhost:8080/api/profiles/cards/search?page=${page}&limit=${limit}`, {
         method: 'GET',
         headers: getOptimizedAuthHeaders(token)
       });
@@ -650,6 +827,42 @@ export const userService = {
       return userData;
     } catch (error) {
       console.error('❌ getCompleteProfile error:', error);
+      throw error;
+    }
+  },
+
+  // 🔍 BUSCAR CARDS CON FILTROS
+  searchPlayerCards: async (filters = {}, page = 0, size = 20) => {
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    console.log('🔍 userService.searchPlayerCards: buscando cards con filtros:', filters);
+    
+    try {
+      // Agregar paginación a los filtros
+      const searchParams = new URLSearchParams({
+        ...filters,
+        page: page.toString(),
+        size: size.toString()
+      });
+      
+      const response = await fetch(`http://localhost:8080/api/profiles/cards/search?${searchParams}`, {
+        method: 'GET',
+        headers: getOptimizedAuthHeaders(token)
+      });
+      
+      if (response.ok) {
+        const cardsData = await response.json();
+        console.log('✅ searchPlayerCards success:', cardsData);
+        return cardsData;
+      } else {
+        console.error('❌ searchPlayerCards error:', response.status, response.statusText);
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('⚠️ searchPlayerCards error:', error.message);
       throw error;
     }
   }

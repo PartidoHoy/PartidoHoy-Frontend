@@ -189,12 +189,30 @@ const HomePage = () => {
             >
               Buscar Jugadores
             </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              startIcon={<EmojiEvents />}
+              onClick={() => navigate('/top-players')}
+              sx={{ borderRadius: 3, px: 3, py: 1.5 }}
+            >
+              Top Jugadores
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              startIcon={<Person />}
+              onClick={() => navigate('/my-profile')}
+              sx={{ borderRadius: 3, px: 3, py: 1.5 }}
+            >
+              Mi Perfil
+            </Button>
           </Box>
         </Box>
 
         <Grid container spacing={3}>
           {/* Left Column */}
-          <Grid item xs={12} lg={8}>
+          <Grid size={{ xs: 12, lg: 8 }}>
             {/* Quick Stats */}
             <Card sx={{ mb: 3, borderRadius: 3, overflow: 'hidden' }}>
               <Box
@@ -207,7 +225,7 @@ const HomePage = () => {
                   Tus Estadísticas
                 </Typography>
                 <Grid container spacing={3}>
-                  <Grid item xs={6} sm={3}>
+                  <Grid size={{ xs: 6, sm: 3 }}>
                     <Box textAlign="center">
                       <Typography variant="h3" fontWeight="800" color="primary">
                         {stats.partidos}
@@ -217,7 +235,7 @@ const HomePage = () => {
                       </Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={6} sm={3}>
+                  <Grid size={{ xs: 6, sm: 3 }}>
                     <Box textAlign="center">
                       <Typography variant="h3" fontWeight="800" color="success.main">
                         {stats.goles}
@@ -227,7 +245,7 @@ const HomePage = () => {
                       </Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={6} sm={3}>
+                  <Grid size={{ xs: 6, sm: 3 }}>
                     <Box textAlign="center">
                       <Typography variant="h3" fontWeight="800" color="info.main">
                         {stats.asistencias}
@@ -237,7 +255,7 @@ const HomePage = () => {
                       </Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={6} sm={3}>
+                  <Grid size={{ xs: 6, sm: 3 }}>
                     <Box textAlign="center">
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
                         <Typography variant="h3" fontWeight="800" color="warning.main">
@@ -272,7 +290,7 @@ const HomePage = () => {
                 
                 <Grid container spacing={3}>
                   {activeMatches.map((match) => (
-                    <Grid item xs={12} md={6} key={match.id}>
+                    <Grid size={{ xs: 12, md: 6 }} key={match.id}>
                       <MatchCard
                         match={match}
                         onJoin={handleJoinMatch}
@@ -286,7 +304,7 @@ const HomePage = () => {
           </Grid>
 
           {/* Right Column */}
-          <Grid item xs={12} lg={4}>
+          <Grid size={{ xs: 12, lg: 4 }}>
             {/* Recent Activity */}
             <Card sx={{ mb: 3, borderRadius: 3 }}>
               <CardContent sx={{ p: 3 }}>
