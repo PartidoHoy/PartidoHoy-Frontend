@@ -15,14 +15,13 @@ import {
 } from '@mui/material';
 import {
   Star,
-  Message,
   PersonAdd,
   SportsSoccer,
   EmojiEvents,
   Verified
 } from '@mui/icons-material';
 
-const PlayerCard = ({ player, onMessage, onAddFriend, onViewProfile }) => {
+const PlayerCard = ({ player, onAddFriend, onViewProfile }) => {
   const theme = useTheme();
 
   const getPositionColor = (position) => {
@@ -52,7 +51,6 @@ const PlayerCard = ({ player, onMessage, onAddFriend, onViewProfile }) => {
   };
 
   // Funciones por defecto si no se proporcionan
-  const handleMessage = onMessage || (() => console.log(`Mensaje a ${player.nombre}`));
   const handleAddFriend = onAddFriend || (() => console.log(`Agregar amigo: ${player.nombre}`));
   const handleViewProfile = onViewProfile || (() => console.log(`Ver perfil: ${player.nombre}`));
 
@@ -220,22 +218,6 @@ const PlayerCard = ({ player, onMessage, onAddFriend, onViewProfile }) => {
         >
           Ver Perfil
         </Button>
-        
-        <Tooltip title="Enviar mensaje">
-          <IconButton
-            onClick={() => handleMessage(player.id)}
-            sx={{
-              border: `1px solid ${theme.palette.divider}`,
-              borderRadius: 2,
-              '&:hover': {
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
-                borderColor: theme.palette.primary.main
-              }
-            }}
-          >
-            <Message sx={{ color: 'text.secondary' }} />
-          </IconButton>
-        </Tooltip>
         
         <Tooltip title="Agregar amigo">
           <IconButton

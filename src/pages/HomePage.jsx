@@ -45,7 +45,6 @@ import {
   Share,
   MoreVert,
   PlayArrow,
-  Person,
   CalendarToday,
   Timeline,
   LocalFireDepartment,
@@ -189,24 +188,7 @@ const HomePage = () => {
             >
               Buscar Jugadores
             </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              startIcon={<EmojiEvents />}
-              onClick={() => navigate('/top-players')}
-              sx={{ borderRadius: 3, px: 3, py: 1.5 }}
-            >
-              Top Jugadores
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              startIcon={<Person />}
-              onClick={() => navigate('/my-profile')}
-              sx={{ borderRadius: 3, px: 3, py: 1.5 }}
-            >
-              Mi Perfil
-            </Button>
+
           </Box>
         </Box>
 

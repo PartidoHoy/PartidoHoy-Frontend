@@ -718,61 +718,7 @@ export const userService = {
     }
   },
 
-  // 🥇 OBTENER TOP JUGADORES POR VICTORIAS
-  getTopPlayersByWins: async (limit = 10) => {
-    const token = localStorage.getItem('jwt');
-    if (!token) {
-      throw new Error('No token found');
-    }
 
-    console.log('🥇 userService.getTopPlayersByWins: obteniendo top jugadores por victorias');
-    
-    try {
-      const response = await fetch(`http://localhost:8080/api/profiles/cards/top/wins?limit=${limit}`, {
-        method: 'GET',
-        headers: getOptimizedAuthHeaders(token)
-      });
-      
-      if (response.ok) {
-        const topPlayers = await response.json();
-        console.log('✅ getTopPlayersByWins success:', topPlayers);
-        return topPlayers;
-      } else {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-    } catch (error) {
-      console.error('⚠️ getTopPlayersByWins error:', error.message);
-      throw error;
-    }
-  },
-
-  // ⚽ OBTENER TOP JUGADORES POR GOLES
-  getTopPlayersByGoals: async (limit = 10) => {
-    const token = localStorage.getItem('jwt');
-    if (!token) {
-      throw new Error('No token found');
-    }
-
-    console.log('⚽ userService.getTopPlayersByGoals: obteniendo top jugadores por goles');
-    
-    try {
-      const response = await fetch(`http://localhost:8080/api/profiles/cards/top/goals?limit=${limit}`, {
-        method: 'GET',
-        headers: getOptimizedAuthHeaders(token)
-      });
-      
-      if (response.ok) {
-        const topPlayers = await response.json();
-        console.log('✅ getTopPlayersByGoals success:', topPlayers);
-        return topPlayers;
-      } else {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-    } catch (error) {
-      console.error('⚠️ getTopPlayersByGoals error:', error.message);
-      throw error;
-    }
-  },
 
   // 👥 OBTENER LISTA DE USUARIOS (MÉTODO ORIGINAL MANTENIDO)
   getUsers: async (page = 1, limit = 10) => {

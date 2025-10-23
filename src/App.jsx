@@ -16,8 +16,6 @@ import UserList from './pages/UserList';
 import UserDetail from './pages/UserDetail';
 import CompleteProfile from './pages/CompleteProfile';
 import Players from './pages/Players';
-import TopPlayers from './pages/TopPlayers';
-import MyProfile from './pages/MyProfile';
 import Matches from './pages/Matches';
 import CreateMatch from './pages/CreateMatch';
 import Teams from './pages/Teams';
@@ -114,26 +112,6 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <Players />
-                  </Layout>
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/top-players" 
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <TopPlayers />
-                  </Layout>
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/my-profile" 
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <MyProfile />
                   </Layout>
                 </ProtectedRoute>
               } 
