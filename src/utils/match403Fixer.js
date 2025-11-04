@@ -120,7 +120,7 @@ export const match403Fixer = {
       try {
         console.log(`🔍 Probando: ${config.name}`);
         
-        const response = await fetch('http://localhost:8080/api/partidos', {
+  const response = await fetch('http://localhost:8080/api/matches', {
           method: 'POST',
           headers: config.headers,
           body: config.body

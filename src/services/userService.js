@@ -552,48 +552,23 @@ export const userService = {
     if (!token) {
       throw new Error('No token found');
     }
-
     console.log('📊 userService.getUserStats: obteniendo estadísticas');
-    
     const endpoint = userId 
       ? `http://localhost:8080/api/profiles/${userId}/stats`
       : 'http://localhost:8080/api/profiles/me/stats';
-    
-    try {
-      const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: getOptimizedAuthHeaders(token)
-      });
-      
-      if (response.ok) {
-        const stats = await response.json();
-        console.log('✅ getUserStats success:', stats);
-        return stats;
-      } else if (response.status === 404) {
-        // Si no existe endpoint de stats, devolver stats por defecto
-        console.log('ℹ️ Endpoint de stats no disponible, usando datos por defecto');
-        return {
-          partidos: 0,
-          goles: 0,
-          asistencias: 0,
-          tarjetasAmarillas: 0,
-          tarjetasRojas: 0,
-          rating: 0
-        };
-      } else {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-    } catch (error) {
-      console.warn('⚠️ getUserStats error, devolviendo stats por defecto:', error.message);
-      // Devolver stats por defecto en caso de error
-      return {
-        partidos: 0,
-        goles: 0,
-        asistencias: 0,
-        tarjetasAmarillas: 0,
-        tarjetasRojas: 0,
-        rating: 0
-      };
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: getOptimizedAuthHeaders(token)
+    });
+    if (response.ok) {
+      const stats = await response.json();
+      console.log('✅ getUserStats success:', stats);
+      return stats;
+    } else if (response.status === 401) {
+      localStorage.removeItem('jwt');
+      throw new Error('Token expirado. Por favor, inicia sesión nuevamente.');
+    } else {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
   },
 
@@ -726,30 +701,17 @@ export const userService = {
     if (!token) {
       throw new Error('No token found');
     }
-
     console.log('👥 userService.getUsers: obteniendo lista de usuarios');
-    
-    try {
-      const response = await fetch(`http://localhost:8080/api/profiles/cards/search?page=${page}&limit=${limit}`, {
-        method: 'GET',
-        headers: getOptimizedAuthHeaders(token)
-      });
-      
-      if (response.ok) {
-        const users = await response.json();
-        console.log('✅ getUsers success:', users);
-        return users;
-      } else if (response.status === 404) {
-        // Si no existe endpoint de users, devolver array vacío
-        console.log('ℹ️ Endpoint de usuarios no disponible, usando datos por defecto');
-        return [];
-      } else {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-    } catch (error) {
-      console.warn('⚠️ getUsers error, devolviendo array vacío:', error.message);
-      // Devolver array vacío en caso de error
-      return [];
+    const response = await fetch(`http://localhost:8080/api/profiles/cards/search?page=${page}&limit=${limit}`, {
+      method: 'GET',
+      headers: getOptimizedAuthHeaders(token)
+    });
+    if (response.ok) {
+      const users = await response.json();
+      console.log('✅ getUsers success:', users);
+      return users;
+    } else {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
   },
 
@@ -757,19 +719,6 @@ export const userService = {
   getCompleteProfile: async () => {
     try {
       const userData = await userService.getCurrentUser();
-      
-      // Verificar si hay datos en fallback
-      const fallbackProfile = localStorage.getItem('fallbackProfile');
-      if (fallbackProfile) {
-        const fallbackData = JSON.parse(fallbackProfile);
-        console.log('📝 Mezclando datos de usuario con fallback');
-        return {
-          ...userData,
-          ...fallbackData,
-          hasFallbackData: true
-        };
-      }
-      
       return userData;
     } catch (error) {
       console.error('❌ getCompleteProfile error:', error);

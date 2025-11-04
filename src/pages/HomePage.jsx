@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -54,6 +54,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import MatchCard from '../components/common/MatchCard';
+import calendarService from '../services/calendarService';
+import matchService from '../services/matchService';
 
 const HomePage = () => {
   const theme = useTheme();
@@ -76,44 +78,37 @@ const HomePage = () => {
     rating: 4.2
   });
 
-  const [activeMatches] = useState([
-    {
-      id: 1,
-      title: 'Fútbol 11 - Nivel Intermedio',
-      location: 'Complejo Deportivo Norte',
-      time: '19:00',
-      date: 'Hoy',
-      players: '8/22',
-      distance: '2.3 km',
-      price: '$15',
-      organizer: 'Carlos Ruiz',
-      urgency: 'high'
-    },
-    {
-      id: 2,
-      title: 'Fútbol 7 - Competitivo',
-      location: 'Cancha La Bombonera',
-      time: '20:30',
-      date: 'Mañana',
-      players: '12/14',
-      distance: '1.8 km',
-      price: '$20',
-      organizer: 'Ana García',
-      urgency: 'medium'
-    },
-    {
-      id: 3,
-      title: 'Fútbol 5 - Amateur',
-      location: 'Centro Deportivo Sur',
-      time: '18:00',
-      date: 'Viernes',
-      players: '6/10',
-      distance: '3.1 km',
-      price: '$12',
-      organizer: 'Miguel Torres',
-      urgency: 'low'
-    }
-  ]);
+  // Estado para partidos reales
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Mapeo de partidos del backend a las props del frontend (igual que en Matches.jsx)
+  const mapMatchFromBackend = (match) => ({
+    ...match,
+    fecha: match.fechaPartido ? match.fechaPartido.split('T')[0] : match.fecha,
+    hora: match.fechaPartido ? match.fechaPartido.split('T')[1]?.slice(0,5) : match.hora,
+    capacidadMaxima: match.jugadoresMaximos || match.capacidadMaxima,
+    tipoCancha: match.tipoSuperficie || match.tipoCancha,
+    jugadoresActuales: match.jugadores?.length || match.jugadoresActuales || 0,
+  });
+
+  useEffect(() => {
+    const loadMatches = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const matchesData = await matchService.getMatches();
+        const mapped = matchesData.map(mapMatchFromBackend);
+        setMatches(mapped);
+      } catch  {
+        setError('Error al cargar los partidos');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadMatches();
+  }, []);
 
   const [recentActivity] = useState([
     { type: 'match', message: 'Participaste en "Fútbol 7 - La Liga"', time: '2 horas', icon: <SportsSoccer /> },
@@ -132,14 +127,25 @@ const HomePage = () => {
     setQuickMatchDialog(true);
   };
 
-  const handleJoinMatch = (matchId) => {
-    navigate(`/matches/${matchId}`);
+  // Unirse a partido (igual que en Matches.jsx, pero navegación directa)
+  const handleJoinMatch = async (matchId) => {
+    try {
+      await matchService.joinMatch(matchId);
+      // Opcional: recargar partidos si quieres actualizar el estado
+      // const matchesData = await matchService.getMatches();
+      // setMatches(matchesData.map(mapMatchFromBackend));
+      navigate(`/matches/${matchId}`);
+    } catch (error) {
+      let message = 'Error al unirse al partido';
+      if (error && error.message) {
+        if (error.message.includes('400')) message = 'Ya estás unido a este partido';
+        else if (error.message.includes('403')) message = 'No tienes permisos para unirte. Inicia sesión o revisa tus permisos.';
+        else if (error.message.includes('404')) message = 'El partido no existe';
+      }
+      setError(message);
+    }
   };
 
-  const handleFavoriteMatch = (matchId) => {
-    console.log('Toggle favorite for match:', matchId);
-    // TODO: Implement favorite functionality
-  };
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 3 }}>
@@ -254,7 +260,7 @@ const HomePage = () => {
               </Box>
             </Card>
 
-            {/* Active Matches */}
+            {/* Active Matches (real data) */}
             <Card sx={{ mb: 3, borderRadius: 3 }}>
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
@@ -269,18 +275,26 @@ const HomePage = () => {
                     Ver todos
                   </Button>
                 </Box>
-                
-                <Grid container spacing={3}>
-                  {activeMatches.map((match) => (
-                    <Grid size={{ xs: 12, md: 6 }} key={match.id}>
-                      <MatchCard
-                        match={match}
-                        onJoin={handleJoinMatch}
-                        onFavorite={handleFavoriteMatch}
-                      />
-                    </Grid>
-                  ))}
-                </Grid>
+                {loading ? (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography variant="body1">Cargando partidos...</Typography>
+                  </Box>
+                ) : error ? (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography color="error">{error}</Typography>
+                  </Box>
+                ) : (
+                  <Grid container spacing={3}>
+                    {matches.map((match) => (
+                      <Grid item xs={12} md={6} key={match.id}>
+                        <MatchCard
+                          match={match}
+                          onJoin={handleJoinMatch}
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+                )}
               </CardContent>
             </Card>
           </Grid>

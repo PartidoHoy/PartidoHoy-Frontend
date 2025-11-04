@@ -18,7 +18,10 @@ import {
   Paper,
   Stepper,
   Step,
-  StepLabel
+  StepLabel,
+  FormGroup,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
 import {
   Add,
@@ -49,32 +52,93 @@ const CreateMatch = () => {
     ciudad: '',
     capacidadMaxima: 10,
     precio: 0,
-    nivelRequerido: 'Intermedio',
-    tipoCancha: 'Césped sintético'
+    nivelRequerido: null,
+  tipoCancha: 'Césped sintético',
+  tipoPartido: 'CASUAL',
+    incluyeArbitro: false,
+    incluyeBalones: true,
+    soloHombres: false,
+    soloMujeres: false
   });
 
   const steps = ['Información Básica', 'Detalles del Lugar', 'Configuración'];
 
   const handleChange = (field, value) => {
-    setMatchData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    // Si el campo es numérico, validar y evitar NaN
+    if (field === 'capacidadMaxima' || field === 'precio') {
+      if (value === '' || value === undefined) {
+        setMatchData(prev => ({
+          ...prev,
+          [field]: ''
+        }));
+      } else {
+        const parsed = field === 'capacidadMaxima' ? parseInt(value) : parseFloat(value);
+        setMatchData(prev => ({
+          ...prev,
+          [field]: isNaN(parsed) ? '' : parsed
+        }));
+      }
+    } else {
+      setMatchData(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    }
   };
 
   const handleSubmit = async () => {
     setLoading(true);
     setError('');
-    
+
+    // Construir el JSON correcto para el backend
     try {
-      console.log('🆕 Creando nuevo partido:', matchData);
-      await matchService.createMatch(matchData);
-      
+      // Combinar fecha y hora en formato ISO requerido
+      let fechaPartido = '';
+      if (matchData.fecha && matchData.hora) {
+        fechaPartido = `${matchData.fecha}T${matchData.hora}:00`;
+      }
+
+      // Mapear los campos según lo requerido
+      const payload = {
+        titulo: matchData.titulo,
+        descripcion: matchData.descripcion || '',
+        fechaPartido,
+        ubicacion: matchData.ubicacion,
+        jugadoresMaximos: Number(matchData.capacidadMaxima),
+        precio: Number(matchData.precio),
+  tipoPartido: matchData.tipoPartido,
+        tipoSuperficie: matchData.tipoCancha === 'Césped sintético' ? 'SINTETICO'
+          : matchData.tipoCancha === 'Césped natural' ? 'NATURAL'
+          : matchData.tipoCancha === 'Tierra' ? 'TIERRA'
+          : matchData.tipoCancha === 'Concreto' ? 'CONCRETO'
+          : matchData.tipoCancha === 'Indoor' ? 'INDOOR'
+          : 'SINTETICO',
+        incluyeArbitro: false,
+        incluyeBalones: true,
+        nivelRequerido: matchData.nivelRequerido || null,
+        soloHombres: false,
+        soloMujeres: false
+      };
+
+      // Eliminar campos vacíos, NaN o strings vacíos para los requeridos
+      if (!payload.fechaPartido) delete payload.fechaPartido;
+      if (!payload.jugadoresMaximos || isNaN(payload.jugadoresMaximos)) delete payload.jugadoresMaximos;
+
+      // No enviar campos vacíos
+      Object.keys(payload).forEach(key => {
+        if (payload[key] === '' || payload[key] === undefined) {
+          delete payload[key];
+        }
+      });
+
+      console.log('🆕 Creando nuevo partido (payload):', payload);
+      await matchService.createMatch(payload);
+
       setSuccess(true);
       setTimeout(() => {
         navigate('/matches');
       }, 2000);
-      
+
     } catch (error) {
       console.error('❌ Error creando partido:', error);
       setError('Error al crear el partido. Inténtalo de nuevo.');
@@ -210,7 +274,7 @@ const CreateMatch = () => {
                 type="number"
                 label="Capacidad máxima *"
                 value={matchData.capacidadMaxima}
-                onChange={(e) => handleChange('capacidadMaxima', parseInt(e.target.value))}
+                onChange={(e) => handleChange('capacidadMaxima', e.target.value)}
                 inputProps={{ min: 2, max: 50 }}
               />
             </Grid>
@@ -220,9 +284,24 @@ const CreateMatch = () => {
                 type="number"
                 label="Precio (€)"
                 value={matchData.precio}
-                onChange={(e) => handleChange('precio', parseFloat(e.target.value))}
+                onChange={(e) => handleChange('precio', e.target.value)}
                 inputProps={{ min: 0, step: 0.5 }}
               />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <InputLabel>Tipo de partido</InputLabel>
+                <Select
+                  value={matchData.tipoPartido}
+                  label="Tipo de partido"
+                  onChange={(e) => handleChange('tipoPartido', e.target.value)}
+                >
+                  <MenuItem value="CASUAL">Casual</MenuItem>
+                  <MenuItem value="COMPETITIVO">Competitivo</MenuItem>
+                  <MenuItem value="TORNEO">Torneo</MenuItem>
+                  <MenuItem value="ENTRENAMIENTO">Entrenamiento</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} sm={4}>
               <FormControl fullWidth>
@@ -232,12 +311,62 @@ const CreateMatch = () => {
                   label="Nivel requerido"
                   onChange={(e) => handleChange('nivelRequerido', e.target.value)}
                 >
+                  <MenuItem value={null}>Sin especificar</MenuItem>
                   <MenuItem value="Principiante">Principiante</MenuItem>
                   <MenuItem value="Intermedio">Intermedio</MenuItem>
                   <MenuItem value="Avanzado">Avanzado</MenuItem>
                   <MenuItem value="Todos los niveles">Todos los niveles</MenuItem>
                 </Select>
               </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <Paper elevation={2} sx={{ p: 2, mt: 2 }}>
+                <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
+                  Opciones adicionales
+                </Typography>
+                <FormGroup row>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={matchData.incluyeArbitro}
+                        onChange={e => handleChange('incluyeArbitro', e.target.checked)}
+                        color="primary"
+                      />
+                    }
+                    label="Incluye árbitro"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={matchData.incluyeBalones}
+                        onChange={e => handleChange('incluyeBalones', e.target.checked)}
+                        color="primary"
+                      />
+                    }
+                    label="Incluye balones"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={matchData.soloHombres}
+                        onChange={e => handleChange('soloHombres', e.target.checked)}
+                        color="primary"
+                      />
+                    }
+                    label="Solo hombres"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={matchData.soloMujeres}
+                        onChange={e => handleChange('soloMujeres', e.target.checked)}
+                        color="primary"
+                      />
+                    }
+                    label="Solo mujeres"
+                  />
+                </FormGroup>
+              </Paper>
             </Grid>
           </Grid>
         );

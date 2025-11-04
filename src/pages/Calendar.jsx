@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Calendar as BigCalendar, dateFnsLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import esES from 'date-fns/locale/es';
 import {
   Container,
   Typography,
@@ -60,139 +64,41 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../hooks/useAuth';
 import calendarService from '../services/calendarService';
+import matchService from '../services/matchService';
 
-// Componente de calendario simple
-const CalendarGrid = ({ events, currentDate, onDateChange, onEventClick }) => {
-  const theme = useTheme();
-  
-  const getDaysInMonth = (date) => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-  };
-
-  const getFirstDayOfMonth = (date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-  };
-
-  const renderCalendarDays = () => {
-    const daysInMonth = getDaysInMonth(currentDate);
-    const firstDay = getFirstDayOfMonth(currentDate);
-    const days = [];
-
-    // Días en blanco del mes anterior
-    for (let i = 0; i < firstDay; i++) {
-      days.push(
-        <Box key={`empty-${i}`} sx={{ 
-          minHeight: 100, 
-          border: `1px solid ${theme.palette.divider}`,
-          bgcolor: 'action.hover' 
-        }} />
-      );
-    }
-
-    // Días del mes actual
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dayEvents = events.filter(event => {
-        const eventDate = new Date(event.fecha);
-        return eventDate.getDate() === day &&
-               eventDate.getMonth() === currentDate.getMonth() &&
-               eventDate.getFullYear() === currentDate.getFullYear();
-      });
-
-      const isToday = new Date().toDateString() === 
-        new Date(currentDate.getFullYear(), currentDate.getMonth(), day).toDateString();
-
-      days.push(
-        <Box
-          key={day}
-          sx={{
-            minHeight: 100,
-            border: `1px solid ${theme.palette.divider}`,
-            p: 1,
-            cursor: 'pointer',
-            bgcolor: isToday ? theme.palette.primary.light + '20' : 'background.paper',
-            '&:hover': {
-              bgcolor: 'action.hover'
-            }
-          }}
-          onClick={() => onDateChange && onDateChange(day)}
-        >
-          <Typography
-            variant="body2"
-            fontWeight={isToday ? 'bold' : 'normal'}
-            color={isToday ? 'primary' : 'text.primary'}
-            sx={{ mb: 1 }}
-          >
-            {day}
-          </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-            {dayEvents.slice(0, 2).map(event => (
-              <Chip
-                key={event.id}
-                label={event.titulo}
-                size="small"
-                sx={{
-                  fontSize: '0.7rem',
-                  height: 20,
-                  bgcolor: event.color || theme.palette.primary.main,
-                  color: 'white',
-                  cursor: 'pointer'
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEventClick && onEventClick(event);
-                }}
-              />
-            ))}
-            {dayEvents.length > 2 && (
-              <Typography variant="caption" color="text.secondary">
-                +{dayEvents.length - 2} más
-              </Typography>
-            )}
-          </Box>
-        </Box>
-      );
-    }
-
-    return days;
-  };
-
-  return (
-    <Box>
-      {/* Días de la semana */}
-      <Grid container>
-        {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
-          <Grid item xs key={day}>
-            <Box sx={{ 
-              p: 1, 
-              textAlign: 'center', 
-              bgcolor: 'primary.main',
-              color: 'primary.contrastText',
-              fontWeight: 'bold'
-            }}>
-              <Typography variant="body2">{day}</Typography>
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
-      
-      {/* Días del mes */}
-      <Grid container>
-        {renderCalendarDays().map((day, index) => (
-          <Grid item xs key={index}>
-            {day}
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
-  );
+// Configuración de localización para react-big-calendar
+const locales = {
+  'es': esES,
 };
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek: () => startOfWeek(new Date(), { weekStartsOn: 1 }),
+  getDay,
+  locales,
+});
 
 const Calendar = () => {
+  // ...existing code...
+
+
+  // ...existing code...
+
+
+  // ...existing code...
+
+  // ...existing code...
+
+  // El log de debug debe ir después del return, fuera del cuerpo de la función Calendar
+
+  // ...existing code...
   const theme = useTheme();
   const { user } = useAuth();
   
   const [events, setEvents] = useState([]);
   const [myEvents, setMyEvents] = useState([]);
+  const [matches, setMatches] = useState([]);
+  const [myMatchIds, setMyMatchIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -219,27 +125,61 @@ const Calendar = () => {
     const loadData = async () => {
       setLoading(true);
       setError('');
-      
       try {
-        console.log('🗓️ Calendar: Cargando eventos...');
-        const [eventsData, myEventsData] = await Promise.all([
+        console.log('🗓️ Calendar: Cargando eventos y partidos...');
+        const [eventsData, myEventsData, matchesData, myMatchesData] = await Promise.all([
           calendarService.getEvents(currentDate.getMonth() + 1, currentDate.getFullYear()),
-          calendarService.getMyEvents()
+          calendarService.getMyEvents(),
+          matchService.getMatches(),
+          matchService.getMyMatches()
         ]);
-        
         setEvents(eventsData);
         setMyEvents(myEventsData);
-        console.log(`✅ Calendar: ${eventsData.length} eventos y ${myEventsData.length} mis eventos cargados`);
+        setMatches(matchesData);
+        setMyMatchIds(myMatchesData.map(m => m.id));
+        console.log(`✅ Calendar: ${eventsData.length} eventos, ${matchesData.length} partidos, ${myEventsData.length} mis eventos, ${myMatchesData.length} mis partidos cargados`);
       } catch (error) {
-        console.error('❌ Error cargando eventos:', error);
-        setError('Error al cargar los eventos');
+        console.error('❌ Error cargando eventos/partidos:', error);
+        setError('Error al cargar los eventos/partidos');
       } finally {
         setLoading(false);
       }
     };
-
     loadData();
   }, [currentDate]);
+
+
+  // Mapear partidos a eventos de calendario
+  const mappedMatches = matches.map(match => ({
+    id: `match-${match.id}`,
+    titulo: match.titulo || match.title || 'Partido',
+    tipo: 'partido',
+    fecha: match.fecha || match.fechaPartido || match.date,
+    hora: match.hora || match.horaPartido || match.time,
+    ubicacion: match.ubicacion || match.location,
+    descripcion: match.descripcion || match.description,
+    estado: match.estado || match.status || 'abierto',
+    organizador: match.organizador || match.owner || match.creador,
+    participantes: match.jugadoresActuales || (match.jugadores ? match.jugadores.length : (match.participants ? match.participants.length : 0)),
+    color: myMatchIds.includes(match.id) ? '#1976d2' : '#43a047', // Azul si inscrito, verde si no
+    isUserInMatch: myMatchIds.includes(match.id)
+  }));
+
+  // Unir eventos normales y partidos
+  const allEvents = [...events, ...mappedMatches];
+  const filteredEvents = filterType ? allEvents.filter(event => event.tipo === filterType) : allEvents;
+
+  // Debug: mostrar los eventos que se envían al calendario (debe ir después de filteredEvents)
+  useEffect(() => {
+    const debugEvents = filteredEvents.map(ev => ({
+      ...ev,
+      title: ev.titulo,
+      start: ev.fecha && ev.hora ? new Date(ev.fecha + 'T' + (ev.hora?.length === 5 ? ev.hora : (ev.hora || '00:00')).slice(0,5)) : new Date(ev.fecha),
+      end: ev.fecha && ev.hora ? new Date(ev.fecha + 'T' + (ev.hora?.length === 5 ? ev.hora : (ev.hora || '00:00')).slice(0,5)) : new Date(ev.fecha),
+      allDay: !ev.hora
+    }));
+    console.log('[DEBUG] Eventos enviados a BigCalendar:', debugEvents);
+  }, [filteredEvents]);
 
   const reloadData = async () => {
     setLoading(true);
@@ -298,17 +238,19 @@ const Calendar = () => {
   const handleJoinEvent = async (eventId) => {
     try {
       setActionLoading({ [`join_${eventId}`]: true });
-      console.log(`🤝 Uniéndose al evento ${eventId}`);
-      
-      await calendarService.joinEvent(eventId);
-      
-      // Recargar datos
+      console.log(`🤝 Uniéndose al partido/evento ${eventId}`);
+      await matchService.joinMatch(eventId);
       await reloadData();
-      
-      console.log('✅ Te has unido al evento exitosamente');
+      console.log('✅ Te has unido al partido exitosamente');
     } catch (error) {
-      console.error('❌ Error uniéndose al evento:', error);
-      setError('Error al unirse al evento');
+      let message = 'Error al unirse al partido';
+      if (error && error.message) {
+        if (error.message.includes('400')) message = 'Ya estás unido a este partido';
+        else if (error.message.includes('403')) message = 'No tienes permisos para unirte. Inicia sesión o revisa tus permisos.';
+        else if (error.message.includes('404')) message = 'El partido no existe';
+      }
+      setError(message);
+      console.error('❌ Error uniéndose al partido:', error);
     } finally {
       setActionLoading({ [`join_${eventId}`]: false });
     }
@@ -380,7 +322,6 @@ const Calendar = () => {
     return event.organizador?.email === user?.email || event.organizador?.id === user?.id;
   };
 
-  const filteredEvents = filterType ? events.filter(event => event.tipo === filterType) : events;
 
   const monthNames = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -394,6 +335,23 @@ const Calendar = () => {
         <Typography variant="h6" color="text.secondary">
           Cargando calendario...
         </Typography>
+      </Container>
+    );
+  }
+
+  // Mostrar error 403 de permisos explícitamente
+  if (error && error.toString().includes('403')) {
+    return (
+      <Container maxWidth="xl" sx={{ py: 4, textAlign: 'center' }}>
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <Typography variant="h5" color="error" fontWeight={700}>
+            Acceso denegado (403)
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            No tienes permisos para ver los eventos o partidos del calendario.<br />
+            Por favor, revisa tu sesión o contacta con el administrador.
+          </Typography>
+        </Alert>
       </Container>
     );
   }
@@ -498,14 +456,66 @@ const Calendar = () => {
 
       {/* Vista de Calendario */}
       {view === 'calendar' && (
-        <Paper sx={{ mb: 4 }}>
-          <CalendarGrid
-            events={filteredEvents}
-            currentDate={currentDate}
-            onEventClick={(event) => {
+        <Paper sx={{ mb: 4, p: 2 }}>
+          <BigCalendar
+            localizer={localizer}
+            events={filteredEvents.map(ev => {
+              // Convertir fecha y hora a objeto Date válido
+              let start, end;
+              if (ev.fecha && ev.hora) {
+                const horaStr = (ev.hora.length === 5 ? ev.hora : (ev.hora || '00:00')).slice(0,5);
+                start = new Date(ev.fecha + 'T' + horaStr);
+              } else if (ev.fecha) {
+                start = new Date(ev.fecha);
+              } else {
+                start = new Date();
+              }
+              // Duración por defecto: 2h
+              end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+              return {
+                ...ev,
+                title: ev.titulo,
+                start,
+                end,
+                allDay: !ev.hora
+              };
+            })}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: 600 }}
+            messages={{
+              next: 'Sig',
+              previous: 'Ant',
+              today: 'Hoy',
+              month: 'Mes',
+              week: 'Semana',
+              day: 'Día',
+              agenda: 'Agenda',
+              date: 'Fecha',
+              time: 'Hora',
+              event: 'Evento',
+              noEventsInRange: 'No hay eventos en este rango.'
+            }}
+            eventPropGetter={event => {
+              let backgroundColor = event.color || '#1976d2';
+              if (event.tipo === 'partido') backgroundColor = event.color || '#43a047';
+              return {
+                style: {
+                  backgroundColor,
+                  color: 'white',
+                  borderRadius: 6,
+                  border: event.isUserInMatch ? '2px solid #ffeb3b' : undefined,
+                  fontWeight: event.isUserInMatch ? 700 : 400
+                }
+              };
+            }}
+            onSelectEvent={event => {
               setSelectedEvent(event);
               setEventDialogOpen(true);
             }}
+            popup
+            views={['month', 'week', 'day', 'agenda']}
+            culture="es"
           />
         </Paper>
       )}
@@ -624,7 +634,7 @@ const Calendar = () => {
                       onClick={() => handleJoinEvent(event.id)}
                       disabled={actionLoading[`join_${event.id}`]}
                     >
-                      Unirse al Evento
+                      Unirse al Partido
                     </Button>
                   )}
                 </CardActions>
@@ -907,7 +917,7 @@ const Calendar = () => {
                       setEventDialogOpen(false);
                     }}
                   >
-                    Unirse al Evento
+                    Unirse al Partido
                   </Button>
                 )
               )}
@@ -920,3 +930,22 @@ const Calendar = () => {
 };
 
 export default Calendar;
+// Debug: mostrar los eventos que se envían a BigCalendar (fuera del cuerpo de la función Calendar)
+// Esto evita el ReferenceError por el orden de inicialización de hooks y variables
+if (typeof window !== 'undefined') {
+  try {
+    const calendarInstance = window.__lastCalendarInstance;
+    if (calendarInstance && calendarInstance.filteredEvents) {
+      const debugEvents = calendarInstance.filteredEvents.map(ev => ({
+        ...ev,
+        title: ev.titulo,
+        start: ev.fecha && ev.hora ? new Date(ev.fecha + 'T' + (ev.hora?.length === 5 ? ev.hora : (ev.hora || '00:00')).slice(0,5)) : new Date(ev.fecha),
+        end: ev.fecha && ev.hora ? new Date(ev.fecha + 'T' + (ev.hora?.length === 5 ? ev.hora : (ev.hora || '00:00')).slice(0,5)) : new Date(ev.fecha),
+        allDay: !ev.hora
+      }));
+      console.log('[DEBUG] Eventos enviados a BigCalendar:', debugEvents);
+    }
+  } catch {
+    // Silenciar error
+  }
+}
